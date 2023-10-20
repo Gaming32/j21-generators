@@ -9,6 +9,9 @@ class GeneratorImpl<T> implements Generator<T> {
     GeneratorState state = GeneratorState.NOT_READY;
     Object next;
 
+    boolean canSend;
+    Object sent;
+
     GeneratorImpl(Runnable body) {
         continuation = Accessors.newContinuation(Generators.SCOPE, body);
     }
@@ -19,7 +22,11 @@ class GeneratorImpl<T> implements Generator<T> {
             case NOT_READY -> {
                 state = GeneratorState.FAILED;
                 Accessors.runContinuation(continuation);
-                yield state == GeneratorState.READY;
+                if (state == GeneratorState.FAILED) {
+                    state = GeneratorState.DONE;
+                    yield false;
+                }
+                yield true;
             }
             case READY -> true;
             case FAILED -> throw new IllegalStateException("Generator failed");
@@ -45,6 +52,18 @@ class GeneratorImpl<T> implements Generator<T> {
             case FAILED -> throw new IllegalStateException("Generator failed");
             case DONE -> throw new NoSuchElementException();
         };
+    }
+
+    @Override
+    public boolean send(Object value) {
+        if (!canSend) {
+            throw new IllegalStateException("Cannot send() immediately");
+        }
+        sent = value;
+        if (state != GeneratorState.NOT_READY) {
+            next(); // Step the iterator again
+        }
+        return hasNext();
     }
 
     enum GeneratorState {
