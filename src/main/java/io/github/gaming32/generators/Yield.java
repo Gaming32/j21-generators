@@ -4,7 +4,12 @@ import io.github.gaming32.generators.internal.Accessors;
 
 public class Yield {
     public static void yield_(Object value) {
-        Generators.RESULTS.put(Accessors.getCurrentContinuation(Generators.SCOPE), value);
+        final GeneratorImpl<?> generator = Generators.GENERATORS.get(Accessors.getCurrentContinuation(Generators.SCOPE));
+        if (generator == null) {
+            throw new IllegalStateException("Current generator not in generator map?");
+        }
+        generator.state = GeneratorImpl.GeneratorState.READY;
+        generator.next = value;
         Accessors.yieldContinuation(Generators.SCOPE);
     }
 
