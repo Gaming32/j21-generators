@@ -4,13 +4,15 @@ import io.github.gaming32.generators.internal.Accessors;
 
 import java.util.NoSuchElementException;
 
-class GeneratorImpl<T> implements Generator<T> {
+class GeneratorImpl<T, R> implements Generator<T, R> {
     final Object continuation;
     GeneratorState state = GeneratorState.NOT_READY;
     Object next;
 
     boolean canSend;
     Object sent;
+
+    R result;
 
     GeneratorImpl(Runnable body) {
         continuation = Accessors.newContinuation(Generators.SCOPE, body);
@@ -60,10 +62,18 @@ class GeneratorImpl<T> implements Generator<T> {
             throw new IllegalStateException("Cannot send() immediately");
         }
         sent = value;
-        if (state != GeneratorState.NOT_READY) {
-            next(); // Step the iterator again
+        if (state == GeneratorState.READY) {
+            next(); // Prepare the generator for a new step
         }
         return hasNext();
+    }
+
+    @Override
+    public R getResult() {
+        if (state != GeneratorState.DONE) {
+            throw new IllegalStateException("Cannot getResult() of an incomplete Generator");
+        }
+        return result;
     }
 
     enum GeneratorState {

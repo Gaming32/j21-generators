@@ -3,7 +3,6 @@ import io.github.gaming32.generators.Generators;
 import io.github.gaming32.generators.Yield;
 
 import java.util.List;
-import java.util.stream.StreamSupport;
 
 public class YieldTest {
     public static void main(String[] args) {
@@ -11,11 +10,12 @@ public class YieldTest {
 //            System.out.println(value);
 //        }
 //        sendTest();
-        sendYieldAllTest();
+//        sendYieldAllTest();
+        resultTest();
     }
 
     public static Iterable<String> test() {
-        return Generators.createGenerator(() -> {
+        return Generators.create(() -> {
             System.out.println("Before a");
             Yield.yield_("a");
             System.out.println("Before b");
@@ -28,7 +28,7 @@ public class YieldTest {
     }
 
     public static void sendTest() {
-        final Generator<String> test = Generators.createGeneratorIterator(() -> {
+        final Generator<String, ?> test = Generators.createGenerator(() -> {
             final Object sent = Yield.yield_("hi");
             System.out.println(sent);
         });
@@ -38,17 +38,27 @@ public class YieldTest {
     }
 
     public static void sendYieldAllTest() {
-        final Iterable<String> sendReceiver = Generators.createGenerator(() -> {
+        final Iterable<String> sendReceiver = Generators.create(() -> {
             Object sent = Yield.yield_("hi");
             System.out.println(sent);
             sent = Yield.yield_("bye");
             System.out.println(sent);
         });
-        final Generator<String> test = Generators.createGeneratorIterator(() -> {
+        final Generator<String, ?> test = Generators.createGenerator(() -> {
             Yield.yieldAll(sendReceiver);
         });
         System.out.println(test.next());
         test.send("bye");
         test.send("try");
+    }
+
+    public static void resultTest() {
+        final Generator<String, Integer> test = Generators.createWithResult(() -> {
+            Yield.yield_("hi");
+            Yield.yield_("bye");
+            return 5;
+        });
+        test.forEachRemaining(System.out::println);
+        System.out.println(test.getResult());
     }
 }
