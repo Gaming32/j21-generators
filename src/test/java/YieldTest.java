@@ -6,12 +6,12 @@ import java.util.List;
 
 public class YieldTest {
     public static void main(String[] args) {
-//        for (final String value : test()) {
-//            System.out.println(value);
-//        }
+        for (final String value : test()) {
+            System.out.println(value);
+        }
 //        sendTest();
 //        sendYieldAllTest();
-        resultTest();
+//        resultTest();
     }
 
     public static Iterable<String> test() {

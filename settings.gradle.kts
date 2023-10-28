@@ -1,2 +1,2 @@
-rootProject.name = "j21-generators"
+rootProject.name = "generators"
 
