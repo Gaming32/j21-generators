@@ -4,7 +4,7 @@ import io.github.gaming32.generators.internal.Accessors;
 
 import java.util.NoSuchElementException;
 
-class GeneratorImpl<T, R> implements Generator<T, R> {
+class GeneratorImpl<T, S, R> implements Generator<T, S, R> {
     final Object continuation;
     GeneratorState state = GeneratorState.NOT_READY;
     Object next;

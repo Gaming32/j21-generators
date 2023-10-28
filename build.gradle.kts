@@ -21,6 +21,15 @@ tasks.test {
 //    useJUnitPlatform()
 }
 
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
+
+tasks.javadoc {
+    isFailOnError = false
+}
+
 publishing {
     repositories {
         fun maven(name: String, releases: String, snapshots: String) {
@@ -81,6 +90,7 @@ publishing {
 
 signing {
     isRequired = false
+    useGpgCmd()
     sign(configurations.archives.get())
     sign(publishing.publications["maven"])
 }
